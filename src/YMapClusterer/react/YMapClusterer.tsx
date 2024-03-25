@@ -1,6 +1,6 @@
 import type TReact from 'react';
 import type {LngLat, YMapEntity} from '@yandex/ymaps3-types';
-import type {CustomReactify} from '@yandex/ymaps3-types/reactify/reactify';
+import type {CustomReactify, OverrideProps, Prettify} from '@yandex/ymaps3-types/reactify/reactify';
 
 import type {ClustererObject, Feature} from '../interface';
 import type {YMapClusterer as YMapClustererI, YMapClustererProps} from '../YMapClusterer';
@@ -36,12 +36,17 @@ import type {YMapClusterer as YMapClustererI, YMapClustererProps} from '../YMapC
  * ```
  */
 
-type YMapClustererReactifiedProps = YMapClustererProps & {
-    /** Function that returns YMapMarker react component to render marker*/
-    marker: (feature: Feature) => TReact.ReactElement;
-    /** Function that returns YMapMarker react component to render cluster*/
-    cluster: (coordinates: LngLat, features: Feature[]) => TReact.ReactElement;
-};
+type YMapClustererReactifiedProps = Prettify<
+    OverrideProps<
+        YMapClustererProps,
+        {
+            /** Function that returns YMapMarker react component to render marker*/
+            marker: (feature: Feature) => TReact.ReactElement;
+            /** Function that returns YMapMarker react component to render cluster*/
+            cluster: (coordinates: LngLat, features: Feature[]) => TReact.ReactElement;
+        }
+    >
+>;
 
 type YMapClustererImperative = new (props: YMapClustererReactifiedProps) => YMapEntity<YMapClustererReactifiedProps>;
 type YMapClustererR = TReact.ForwardRefExoticComponent<
