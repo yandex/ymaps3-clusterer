@@ -5,6 +5,7 @@ import type {ClustererObject, EntitiesMap, Feature, IClusterMethod} from './inte
 import {THROTTLE_DEFAULT_TIMEOUT_MS} from './constants';
 import {throttle} from './helpers/throttle';
 import {YMapClustererReactifyOverride} from './react/YMapClusterer';
+import {YMapClustererVuefyOverride, YMapClustererVuefyOptions} from './vue/YMapClusterer';
 
 /**
  * YMapClusterer props
@@ -22,6 +23,11 @@ type YMapClustererProps = {
     tickTimeout?: number;
     /** Return false, if you want to override the render */
     onRender?: (clusters: ClustererObject[]) => void | false;
+    /**
+     * Maximum zoom for clusterisation.
+     * If map zoom is bigger, markers will be displayed as is.
+     **/
+    maxZoom?: number;
 };
 
 type DefaultProps = typeof defaultProps;
@@ -58,6 +64,8 @@ class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, Default
     static defaultProps = defaultProps;
     /** @internal */
     static [ymaps3.overrideKeyReactify] = YMapClustererReactifyOverride;
+    static [ymaps3.overrideKeyVuefy] = YMapClustererVuefyOverride;
+    static [ymaps3.optionsKeyVuefy] = YMapClustererVuefyOptions;
 
     /** All created entities with cluster id*/
     private _entitiesCache: EntitiesMap = {};
@@ -74,7 +82,8 @@ class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, Default
     }
 
     /**
-     * Compare feature coordinates with bounds
+     * Compare feature coordinates with bounds.
+     * Visible in x2 bounds.
      *
      * @param feature
      * @param bounds
@@ -85,7 +94,14 @@ class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, Default
         const {x, y} = projection.toWorldCoordinates(feature.geometry.coordinates as LngLat);
         const {x: x1, y: y1} = projection.toWorldCoordinates(bounds[0]);
         const {x: x2, y: y2} = projection.toWorldCoordinates(bounds[1]);
-        return x1 <= x && y1 >= y && x2 >= x && y2 <= y;
+        const boundsWidth = x2 - x1;
+        const boundsHeight = y1 - y2;
+        return (
+            x1 - boundsWidth / 2 <= x &&
+            x2 + boundsWidth / 2 >= x &&
+            y1 + boundsHeight / 2 >= y &&
+            y2 - boundsHeight / 2 <= y
+        );
     }
 
     /**
@@ -156,10 +172,20 @@ class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, Default
             this._isVisible(feature, map.bounds, map.projection)
         );
 
-        const nextViewportObjects = this._props.method.render({
-            map,
-            features: visibleFeatures
-        });
+        let nextViewportObjects: ClustererObject[];
+        if (this._props.maxZoom && map.zoom > this._props.maxZoom) {
+            nextViewportObjects = visibleFeatures.map((feature) => ({
+                world: map.projection.toWorldCoordinates(feature.geometry.coordinates),
+                lnglat: feature.geometry.coordinates,
+                clusterId: feature.id,
+                features: [feature]
+            }));
+        } else {
+            nextViewportObjects = this._props.method.render({
+                map,
+                features: visibleFeatures
+            });
+        }
 
         if (this._props.onRender && this._props.onRender(nextViewportObjects) === false) {
             return;
