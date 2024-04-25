@@ -196,10 +196,6 @@ class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, Default
         this._visibleEntities = nextVisibleEntities;
     }
 
-    protected __implGetDefaultProps(): DefaultProps {
-        return YMapClusterer.defaultProps;
-    }
-
     protected _onAttach(): void {
         this._entitiesCache = {};
         this._visibleEntities = {};
