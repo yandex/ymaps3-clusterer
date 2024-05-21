@@ -28,7 +28,7 @@ type YMapClustererSlots = {
 
 export const YMapClustererVuefyOverride: CustomVuefyFn<YMapClusterer> = (YMapClustererI, props, {vuefy, Vue}) => {
     const YMapClustererV = vuefy.entity(YMapClustererI, props);
-    const YMapCollectionV = vuefy.entity(ymaps3.YMapCollection, props);
+    const YMapCollectionV = vuefy.entity(ymaps3.YMapCollection);
     return Vue.defineComponent({
         name: 'YMapClustererContainer',
         props,

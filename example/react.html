@@ -25,7 +25,7 @@
                     YMapMarker
                 } = reactify.module(ymaps3);
 
-                const {YMapClusterer, clusterByGrid} = reactify.module(await ymaps3.import("@yandex/ymaps3-clusterer@0.0.1"));
+                const {YMapClusterer, clusterByGrid} = reactify.module(await ymaps3.import("@yandex/ymaps3-clusterer"));
                 const {useState, useCallback, useMemo} = React;
                 const initialPoints = getRandomPoints(100, BOUNDS);
                 const gridSizedMethod = clusterByGrid({gridSize: 64})

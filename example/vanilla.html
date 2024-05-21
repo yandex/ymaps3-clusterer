@@ -14,7 +14,7 @@
                 await ymaps3.ready;
                 const {YMap, YMapDefaultSchemeLayer, YMapLayer, YMapFeatureDataSource} = ymaps3;
 
-                const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1');
+                const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer');
 
                 map = new YMap(document.getElementById('app'), {location: LOCATION});
                 map.addChild(new YMapDefaultSchemeLayer())
