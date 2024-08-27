@@ -1,0 +1,7 @@
+declare module '@yandex/ymaps3-types/import' {
+    interface Import {
+        (pkg: '@yandex/ymaps3-clusterer'): Promise<typeof import('./index')>;
+    }
+}
+
+export {};
