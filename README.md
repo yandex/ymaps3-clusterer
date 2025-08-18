@@ -17,27 +17,48 @@ The package is located in the `dist` folder:
 - `dist/esm` es6 modules for direct connection in your project
 - `dist/index.js` Yandex JS Module
 
-to use Yandex JS Module you need to add your module loading handler to JS API
+Recommended use `@yandex/ymaps3-clusterer` as usual npm package.
 
-```js
-ymaps3.import.loaders.unshift(async (pkg) => {
-  if (!pkg.includes('@yandex/ymaps3-clusterer')) {
-    return;
-  }
+### Usage with npm
 
-  if (location.href.includes('localhost')) {
-    await ymaps3.import.script(`/dist/index.js`);
-  } else {
-    // You can use another CDN
-    await ymaps3.import.script(`https://unpkg.com/${pkg}/dist/index.js`);
-  }
+Install `@yandex/ymaps3-clusterer` package from npm:
 
-  Object.assign(ymaps3, window[`${pkg}`]);
-  return window[`${pkg}`];
-});
+```sh
+npm install @yandex/ymaps3-clusterer
 ```
 
-and in your final code just use `ymaps3.import`
+The JS API is loaded dynamically, so the package must be used after the main JS API has loaded:
+
+```js
+await ymaps3.ready; // waiting for the main JS API to load.
+
+// ...
+
+const {YMapClusterer} = await import('@yandex/ymaps3-clusterer');
+
+// ...
+
+map.addChild(new YMapClusterer(props));
+```
+
+### Usage without npm
+
+You can use CDN with module loading handler in JS API on your page.
+
+By default `ymaps3.import` can load self modules.
+Just use `ymaps3.registerCdn` and `ymaps3.import`:
+
+```js
+// register in `ymaps3.import` which CDN to take the package from
+ymaps3.import.registerCdn('https://cdn.jsdelivr.net/npm/{package}', '@yandex/ymaps3-clusterer@latest');
+
+// ...
+
+// import package from CDN
+const {YMapClusterer} = await ymaps3.import('@yandex/ymaps3-clusterer');
+```
+
+## Working with the package
 
 We will use these functions and constants in example:
 
@@ -76,7 +97,7 @@ async function main() {
   await ymaps3.ready;
   const {YMap, YMapDefaultSchemeLayer, YMapLayer, YMapFeatureDataSource} = ymaps3;
 
-  const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1');
+  const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer');
 
   map = new YMap(document.getElementById('app'), {location: LOCATION});
   map
@@ -138,9 +159,7 @@ async function main() {
   const reactify = ymaps3React.reactify.bindTo(React, ReactDOM);
   const {YMap, YMapDefaultSchemeLayer, YMapLayer, YMapFeatureDataSource, YMapMarker} = reactify.module(ymaps3);
 
-  const {YMapClusterer, clusterByGrid} = reactify.module(
-    await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1')
-  );
+  const {YMapClusterer, clusterByGrid} = reactify.module(await ymaps3.import('@yandex/ymaps3-clusterer'));
   const {useState, useCallback, useMemo} = React;
   const points = getRandomPoints(100, BOUNDS);
   const gridSizedMethod = clusterByGrid({gridSize: 64});
@@ -208,7 +227,7 @@ async function main() {
 We load the package with the clusterer, extract the classes for creating clusterer objects and the clustering method.
 
 ```javascript
-const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1');
+const {YMapClusterer, clusterByGrid} = await ymaps3.import('@yandex/ymaps3-clusterer');
 ```
 
 Create and add to the map a layer with a default schema, data sources, a layer of markers.
@@ -291,10 +310,10 @@ For the clustering method, we will pass the size of the grid division in pixels.
 
 ```javascript
 const clusterer = new YMapClusterer({
-    method: clusterByGrid({gridSize: 64}),
-    features: points,
-    marker,
-    cluster
+  method: clusterByGrid({gridSize: 64}),
+  features: points,
+  marker,
+  cluster
 });
 
 map.addChild(clusterer);
@@ -311,13 +330,7 @@ async function main() {
   await ymaps3.ready;
   const ymaps3React = await ymaps3.import('@yandex/ymaps3-reactify');
   const reactify = ymaps3React.reactify.bindTo(React, ReactDOM);
-  const {
-    YMap,
-    YMapDefaultSchemeLayer,
-    YMapLayer,
-    YMapFeatureDataSource,
-    YMapMarker
-  } = reactify.module(ymaps3);
+  const {YMap, YMapDefaultSchemeLayer, YMapLayer, YMapFeatureDataSource, YMapMarker} = reactify.module(ymaps3);
   // ...
 }
 ```
@@ -325,9 +338,7 @@ async function main() {
 We connect the package with the clusterer, extract the classes for creating clusterer objects and the clustering method.
 
 ```jsx
-const {YMapClusterer, clusterByGrid} = reactify.module(
-  await ymaps3.import('@yandex/ymaps3-clusterer@0.0.1')
-);
+const {YMapClusterer, clusterByGrid} = reactify.module(await ymaps3.import('@yandex/ymaps3-clusterer'));
 ```
 
 We extract the necessary hooks. Let's declare an array with marker coordinates, then create an array of features with the appropriate interface.
@@ -402,20 +413,17 @@ In the clusterer props, we pass the previously declared functions for rendering 
 ```jsx
 function App() {
   // ...
-  return <>
-    <YMap location={LOCATION} ref={x => map = x}>
-      <YMapDefaultSchemeLayer />
-      <YMapFeatureDataSource id="my-source" />
-      <YMapLayer source="my-source" type="markers" zIndex={1800} />
-      <YMapClusterer
-        marker={marker}
-        cluster={cluster}
-        method={gridSizedMethod}
-        features={points}
-      />
-    </YMap>
-  </>;
+  return (
+    <>
+      <YMap location={LOCATION} ref={(x) => (map = x)}>
+        <YMapDefaultSchemeLayer />
+        <YMapFeatureDataSource id="my-source" />
+        <YMapLayer source="my-source" type="markers" zIndex={1800} />
+        <YMapClusterer marker={marker} cluster={cluster} method={gridSizedMethod} features={points} />
+      </YMap>
+    </>
+  );
 }
 // ...
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App />, document.getElementById('app'));
 ```
