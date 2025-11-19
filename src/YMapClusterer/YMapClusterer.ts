@@ -61,6 +61,7 @@ const defaultProps = Object.freeze({
  * ```
  */
 class YMapClusterer extends ymaps3.YMapComplexEntity<YMapClustererProps, DefaultProps> {
+    static readonly __implName = 'YMapClusterer';
     static defaultProps = defaultProps;
     /** @internal */
     static [ymaps3.overrideKeyReactify] = YMapClustererReactifyOverride;
