@@ -11,3 +11,6 @@ tests
 .DS_Store
 jest*.js
 *.tgz
+.env.*
+/.npmrc
+/.nvmrc
