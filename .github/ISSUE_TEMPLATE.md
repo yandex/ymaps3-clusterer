@@ -1,5 +1,4 @@
 <!-- BUGS: Please use this template -->
-<!-- QUESTIONS: This is not a general support forum! Ask Qs at http://stackoverflow.com/questions/tagged/@yandex/ymaps3-clusterer -->
 
 **@yandex/ymaps3-clusterer Version:**  xxxxx
 
