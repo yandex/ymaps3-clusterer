@@ -1,3 +1,6 @@
+const config = require('@yandex/ymaps3-cli/jest.config');
+
 module.exports = {
-    ...require('@yandex/ymaps3-cli/jest.config')
-}
+    ...config,
+    setupFiles: [require.resolve('./jest.globals'), ...config.setupFiles]
+};

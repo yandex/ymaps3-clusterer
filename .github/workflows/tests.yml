@@ -1,23 +1,50 @@
 name: Run tests
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-jobs:
-  tests:
-    runs-on: ubuntu-latest
+permissions:
+  contents: read
 
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3 #Setup Node
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
-
-      - name: Run Tests
+          package-manager-cache: false
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+        env:
+          APIKEY: build-only
+      - name: Inspect package
+        run: npm pack --dry-run
+      - name: Check integration test credentials
+        id: integration
         run: |
-          npm ci
-          REFERRER=${{ secrets.REFERRER }} APIKEY=${{ secrets.APIKEY }} npm test
+          if [ -n "$APIKEY" ]; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::JS API integration tests are skipped: APIKEY is not available.'
+            echo 'JS API integration tests skipped: configure APIKEY. Fork PRs do not receive secrets.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          APIKEY: ${{ secrets.APIKEY }}
+      - name: JS API integration tests
+        if: steps.integration.outputs.available == 'true'
+        run: npm test -- --runInBand
+        env:
+          APIKEY: ${{ secrets.APIKEY }}
+          REFERRER: ${{ secrets.REFERRER || 'http://yandex.localhost/' }}

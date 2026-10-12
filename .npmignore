@@ -8,3 +8,6 @@ tests
 .env
 .gitignore
 .npmignore
+.DS_Store
+jest*.js
+*.tgz
