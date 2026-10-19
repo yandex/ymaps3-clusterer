@@ -8,7 +8,7 @@ npm ci
 ```
 
 For the examples and JS API integration tests, set `APIKEY` in an untracked `.env`
-file. Obtain a key at https://developer.tech.yandex.ru/ and allow the referrer you
+file. Obtain a key at https://yandex.ru/maps-api/console/ and allow the referrer you
 use locally (for example, `http://yandex.localhost/`). Set `REFERRER` accordingly.
 
 ```sh
