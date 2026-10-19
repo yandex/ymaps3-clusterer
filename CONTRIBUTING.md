@@ -80,6 +80,6 @@ matching version tag and atomically pushes main with only that new tag. It
 refuses a dirty checkout or a different branch. Do not use `git push --tags`
 when importing historical tags.
 
-Stable versions publish to npm `latest`. Explicitly prepared prerelease tags
-publish to `next`; a prerelease does not replace `latest`. Git tags identify
-source commits; npm dist-tags identify installation channels.
+The release workflow uses `npm publish ./ --access public` for regular releases
+with the default npm `latest` tag. Git tags identify source commits; npm
+dist-tags identify installation channels.
