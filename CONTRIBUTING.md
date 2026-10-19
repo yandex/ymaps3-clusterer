@@ -15,7 +15,7 @@ use locally (for example, `http://yandex.localhost/`). Set `REFERRER` accordingl
 npm start
 npm run lint
 npm run build
-REFERRER=http://yandex.localhost/ npm test -- --runInBand
+REFERRER=http://yandex.localhost/ npm test
 npm pack --dry-run
 ```
 

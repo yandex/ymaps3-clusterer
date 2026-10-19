@@ -27,7 +27,7 @@ jobs:
           APIKEY: ${{ secrets.APIKEY }}
           REFERRER: ${{ secrets.REFERRER }}
       - name: Run Tests
-        run: npm test -- --runInBand
+        run: npm test
         env:
           APIKEY: ${{ secrets.APIKEY }}
           REFERRER: ${{ secrets.REFERRER }}
