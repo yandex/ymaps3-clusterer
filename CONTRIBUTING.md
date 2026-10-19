@@ -83,3 +83,5 @@ when importing historical tags.
 The release workflow uses `npm publish ./ --access public` for regular releases
 with the default npm `latest` tag. Git tags identify source commits; npm
 dist-tags identify installation channels.
+The workflow checks that the Git tag matches `package.json`; npm itself rejects
+publication of a version that has already been used.
