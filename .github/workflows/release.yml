@@ -57,15 +57,13 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # The shared webpack config requires a key but does not make API requests.
-          APIKEY: build-only
+          APIKEY: ${{ secrets.APIKEY }}
+          REFERRER: ${{ secrets.REFERRER }}
       - name: Test
-        run: |
-          test -n "$APIKEY" || { echo 'Configure the APIKEY secret before releasing.'; exit 1; }
-          npm test -- --runInBand
+        run: npm test -- --runInBand
         env:
           APIKEY: ${{ secrets.APIKEY }}
-          REFERRER: ${{ secrets.REFERRER || 'http://yandex.localhost/' }}
+          REFERRER: ${{ secrets.REFERRER }}
       - name: Inspect package
         run: npm pack --dry-run
       - name: Publish

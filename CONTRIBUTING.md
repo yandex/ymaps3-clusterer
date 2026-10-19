@@ -19,24 +19,27 @@ REFERRER=http://yandex.localhost/ npm test -- --runInBand
 npm pack --dry-run
 ```
 
-Building the package makes no JS API requests. In CI it uses `APIKEY=build-only`
-because the shared webpack configuration requires a nonempty key.
+Building the package makes no JS API requests, but the shared webpack
+configuration requires a nonempty `APIKEY`. CI supplies the same GitHub Actions
+secrets to the build and integration tests.
 
 The Jest setup makes `navigator` and `crypto` writable in Jest 29 on Node 24 before
 `@yandex/ymaps3-cli` installs its JSDOM globals. This only affects tests.
 
 ## GitHub Actions
 
-- `.github/workflows/tests.yml` installs, lints, builds and inspects the package on
-  main, pull requests and manual runs. JS API integration tests run when the
-  `APIKEY` secret is available. Missing credentials produce an explicit warning
-  and summary; fork PRs still run the checks that do not require secrets.
+- `.github/workflows/tests.yml` installs dependencies, builds and runs JS API
+  integration tests on main and pull requests. Both the build and tests receive
+  `APIKEY` and `REFERRER` from GitHub Actions secrets. Tests are not skipped when
+  credentials are missing: the workflow fails. Fork PRs do not receive these
+  secrets and cannot pass this workflow without a separate trusted run.
 - `.github/workflows/release.yml` releases version tags without a `v` prefix, such
   as `0.0.13`. A manual run must also select a tag matching `package.json`.
   A release always requires passing integration tests with a real `APIKEY`.
 
-Configure the GitHub Actions secrets `APIKEY` and, if needed, `REFERRER` (default:
-`http://yandex.localhost/`). No npm publish token is required.
+Configure the GitHub Actions secrets `APIKEY` and `REFERRER` (for example,
+`http://yandex.localhost/`, allowed by the key's restrictions). No npm publish
+token is required.
 
 ## Enable npm publishing
 

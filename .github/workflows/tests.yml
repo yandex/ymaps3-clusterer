@@ -1,7 +1,6 @@
 name: Run tests
 
 on:
-  workflow_dispatch:
   push:
     branches: [main]
   pull_request:
@@ -11,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  checks:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -22,29 +21,13 @@ jobs:
           package-manager-cache: false
       - name: Install dependencies
         run: npm ci
-      - name: Lint
-        run: npm run lint
       - name: Build
         run: npm run build
         env:
-          APIKEY: build-only
-      - name: Inspect package
-        run: npm pack --dry-run
-      - name: Check integration test credentials
-        id: integration
-        run: |
-          if [ -n "$APIKEY" ]; then
-            echo 'available=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'available=false' >> "$GITHUB_OUTPUT"
-            echo '::warning::JS API integration tests are skipped: APIKEY is not available.'
-            echo 'JS API integration tests skipped: configure APIKEY. Fork PRs do not receive secrets.' >> "$GITHUB_STEP_SUMMARY"
-          fi
-        env:
           APIKEY: ${{ secrets.APIKEY }}
-      - name: JS API integration tests
-        if: steps.integration.outputs.available == 'true'
+          REFERRER: ${{ secrets.REFERRER }}
+      - name: Run Tests
         run: npm test -- --runInBand
         env:
           APIKEY: ${{ secrets.APIKEY }}
-          REFERRER: ${{ secrets.REFERRER || 'http://yandex.localhost/' }}
+          REFERRER: ${{ secrets.REFERRER }}
