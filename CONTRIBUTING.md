@@ -35,6 +35,8 @@ The Jest setup makes `navigator` and `crypto` writable in Jest 29 on Node 24 bef
   secrets and cannot pass this workflow without a separate trusted run.
 - `.github/workflows/release.yml` releases version tags without a `v` prefix, such
   as `0.0.13`. A manual run must also select a tag matching `package.json`.
+  The tagged commit must already be part of `origin/main`; commits from unmerged
+  branches are rejected before dependencies are installed.
   A release always requires passing integration tests with a real `APIKEY`.
 
 Configure the GitHub Actions secrets `APIKEY` and `REFERRER` (for example,
@@ -83,5 +85,6 @@ when importing historical tags.
 The release workflow uses `npm publish ./ --access public` for regular releases
 with the default npm `latest` tag. Git tags identify source commits; npm
 dist-tags identify installation channels.
-The workflow checks that the Git tag matches `package.json`; npm itself rejects
-publication of a version that has already been used.
+The workflow checks that the Git tag matches `package.json` and that its commit
+is part of `origin/main`; npm itself rejects publication of a version that has
+already been used. Older commits in main's history are also eligible.

@@ -22,6 +22,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
@@ -36,6 +38,16 @@ jobs:
             throw new Error('Select a version tag matching package.json, without a v prefix.');
           }
           NODE
+
+      - name: Validate release commit
+        shell: bash
+        run: |
+          git fetch origin main:refs/remotes/origin/main
+
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "::error::Release commit must be part of main."
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
