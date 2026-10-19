@@ -1,0 +1,16 @@
+.idea
+.vscode
+.github
+node_modules
+src
+tests
+.editorconfig
+.env
+.gitignore
+.npmignore
+.DS_Store
+jest*.js
+*.tgz
+.env.*
+/.npmrc
+/.nvmrc
